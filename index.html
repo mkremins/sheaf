@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Sheaf</title>
+  <style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  main {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    margin: 1em auto;
+    min-width: 600px;
+    max-width: 900px;
+  }
+  .search {
+    margin-bottom: 1em;
+  }
+  #search {
+    font-size: 13px;
+  }
+  .link {
+    margin-bottom: 1em;
+  }
+  .link .title {
+    font-size: 15px;
+    font-weight: bold;
+    margin-right: 0.5em;
+    text-decoration: none;
+  }
+  .link .domain {
+    color: #888;
+    cursor: pointer;
+    font-size: 12px;
+    font-style: italic;
+  }
+  .link .tag {
+    background-color: #fffcd7;
+    border: 1px solid #d5d458;
+    border-radius: 10px;
+    color: #555;
+    cursor: pointer;
+    font-size: 10px;
+    margin-right: 5px;
+    padding: 0px 0.5em 1px 0.5em;
+  }
+  </style>
+</head>
+<body>
+  <main id="app"></main>
+  <script src="target/app.js"></script>
+</body>
+</html>
