@@ -83,6 +83,17 @@
                     :placeholder "Type to search..."
                     :type "text"
                     :value (:query data)}))
+      (dom/div {:class "submit"}
+        (dom/table
+          (dom/tr
+            (dom/td "URL")
+            (dom/td (dom/input {:id "url" :type "text"})))
+          (dom/tr
+            (dom/td "Title")
+            (dom/td (dom/input {:id "title" :type "text"})))
+          (dom/tr
+            (dom/td "Tags")
+            (dom/td (dom/input {:id "tags" :type "text"})))))
       (dom/div {:class "links"}
         (om/build-all link-view (filtered-links data))))))
 
