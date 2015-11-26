@@ -21,6 +21,15 @@
     (-> (update data :links conj submission)
         (assoc :submission {:url "" :title "" :tags ""}))))
 
+(defn delete-link [data url]
+  (update data :links (fn [links] (vec (remove #(= (:url %) url) links)))))
+
+(defn edit-link [data url]
+  (let [link (-> (first (filter #(= (:url %) url) (:links data)))
+                 (update :tags (partial str/join ",")))]
+    (-> (delete-link data url)
+        (assoc :submission link))))
+
 ;; search functionality
 
 (defn domain [link]
@@ -77,8 +86,11 @@
           (dom/span {:class "domain"
                      :on-click #(swap! app-state assoc :query (str "domain:" d))}
             d)))
-      (dom/div {:class "tags"}
-        (om/build-all tag-view (sort (:tags data)))))))
+      (dom/span {:class "tags"}
+        (om/build-all tag-view (sort (:tags data))))
+      (dom/span {:class "buttons"}
+        (dom/span {:on-click #(swap! app-state edit-link (:url data))} "edit")
+        (dom/span {:on-click #(swap! app-state delete-link (:url data))} "delete")))))
 
 (defcomponent submit-view [data owner]
   (render [_]
