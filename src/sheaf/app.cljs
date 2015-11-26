@@ -13,7 +13,13 @@
 ;; app state
 
 (def app-state
-  (atom {:links data/links}))
+  (atom {:links data/links
+         :submission {:url "" :title "" :tags ""}}))
+
+(defn submit-link [{:keys [submission] :as data}]
+  (let [submission (update submission :tags #(set (str/split % #",")))]
+    (-> (update data :links conj submission)
+        (assoc :submission {:url "" :title "" :tags ""}))))
 
 ;; search functionality
 
@@ -74,6 +80,34 @@
       (dom/div {:class "tags"}
         (om/build-all tag-view (sort (:tags data)))))))
 
+(defcomponent submit-view [data owner]
+  (render [_]
+    (dom/div {:class "submit"}
+      (dom/table
+        (dom/tr
+          (dom/td "URL")
+          (dom/td
+            (dom/input {:on-change #(om/update! data :url (.. % -target -value))
+                        :type "text"
+                        :value (:url data)})))
+        (dom/tr
+          (dom/td "Title")
+          (dom/td
+            (dom/input {:on-change #(om/update! data :title (.. % -target -value))
+                        :type "text"
+                        :value (:title data)})))
+        (dom/tr
+          (dom/td "Tags")
+          (dom/td
+            (dom/input {:on-change #(om/update! data :tags (.. % -target -value))
+                        :type "text"
+                        :value (:tags data)}))))
+      (dom/button (cond-> {:class "submit-button"
+                           :on-click #(swap! app-state submit-link)}
+                          (or (empty? (:url data)) (empty? (:title data)))
+                          (assoc :disabled true))
+        "Submit"))))
+
 (defcomponent app [data owner]
   (render [_]
     (dom/div
@@ -83,17 +117,7 @@
                     :placeholder "Type to search..."
                     :type "text"
                     :value (:query data)}))
-      (dom/div {:class "submit"}
-        (dom/table
-          (dom/tr
-            (dom/td "URL")
-            (dom/td (dom/input {:id "url" :type "text"})))
-          (dom/tr
-            (dom/td "Title")
-            (dom/td (dom/input {:id "title" :type "text"})))
-          (dom/tr
-            (dom/td "Tags")
-            (dom/td (dom/input {:id "tags" :type "text"})))))
+      (om/build submit-view (:submission data))
       (dom/div {:class "links"}
         (om/build-all link-view (filtered-links data))))))
 
