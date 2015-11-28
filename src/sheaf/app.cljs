@@ -17,8 +17,7 @@
 ;; app state
 
 (def app-state
-  (atom {:links []
-         :submission {:url "" :title "" :tags ""}}))
+  (atom {:submission {:url "" :title "" :tags ""}}))
 
 (defn load-links! []
   (let [stored (some-> (js/localStorage.getItem "links") reader/read-string)]
