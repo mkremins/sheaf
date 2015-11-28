@@ -30,18 +30,18 @@
       (println (str "Store links: " s))
       (js/localStorage.setItem "links" s))))
 
-(defn submit-link [{:keys [submission] :as data}]
+(defn submit-link [{:keys [submission] :as state}]
   (let [submission (update submission :tags #(set (str/split % #",")))]
-    (-> (update data :links conj submission)
+    (-> (update state :links conj submission)
         (assoc :submission {:url "" :title "" :tags ""}))))
 
-(defn delete-link [data url]
-  (update data :links (fn [links] (vec (remove #(= (:url %) url) links)))))
+(defn delete-link [state url]
+  (update state :links (fn [links] (vec (remove #(= (:url %) url) links)))))
 
-(defn edit-link [data url]
-  (let [link (-> (first (filter #(= (:url %) url) (:links data)))
+(defn edit-link [state url]
+  (let [link (-> (first (filter #(= (:url %) url) (:links state)))
                  (update :tags (partial str/join ",")))]
-    (-> (delete-link data url)
+    (-> (delete-link state url)
         (assoc :submission link))))
 
 ;; search functionality
