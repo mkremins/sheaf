@@ -11,6 +11,9 @@
 (defn substring? [super sub]
   (not= -1 (.indexOf super sub)))
 
+(defn value [ev]
+  (.. ev -target -value))
+
 ;; app state
 
 (def app-state
@@ -110,19 +113,19 @@
         (dom/tr
           (dom/td "URL")
           (dom/td
-            (dom/input {:on-change #(om/update! data :url (.. % -target -value))
+            (dom/input {:on-change #(om/update! data :url (value %))
                         :type "text"
                         :value (:url data)})))
         (dom/tr
           (dom/td "Title")
           (dom/td
-            (dom/input {:on-change #(om/update! data :title (.. % -target -value))
+            (dom/input {:on-change #(om/update! data :title (value %))
                         :type "text"
                         :value (:title data)})))
         (dom/tr
           (dom/td "Tags")
           (dom/td
-            (dom/input {:on-change #(om/update! data :tags (.. % -target -value))
+            (dom/input {:on-change #(om/update! data :tags (value %))
                         :type "text"
                         :value (:tags data)}))))
       (dom/button (cond-> {:class "submit-button"
@@ -136,7 +139,7 @@
     (dom/div
       (dom/div {:class "search"}
         (dom/input {:id "search"
-                    :on-change #(om/update! data :query (.. % -target -value))
+                    :on-change #(om/update! data :query (value %))
                     :placeholder "Type to search..."
                     :type "text"
                     :value (:query data)}))
