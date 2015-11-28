@@ -3,8 +3,7 @@
             [clojure.string :as str]
             [om.core :as om]
             [om-tools.core :refer-macros [defcomponent]]
-            [om-tools.dom :as dom]
-            [sheaf.data :as data]))
+            [om-tools.dom :as dom]))
 
 ;; generic helper fns
 
@@ -19,9 +18,14 @@
 (def app-state
   (atom {:submission {:url "" :title "" :tags ""}}))
 
+(def default-links
+  [{:title "Locked doors, headaches, and intellectual need"
+    :url "http://mkremins.github.io/blog/doors-headaches-intellectual-need/"
+    :tags #{"games" "learning"}}])
+
 (defn load-links! []
   (let [stored (some-> (js/localStorage.getItem "links") reader/read-string)]
-    (swap! app-state assoc :links (or stored data/links))))
+    (swap! app-state assoc :links (or stored default-links))))
 
 (defn store-changes! [_ _ old-state new-state]
   (when-not (= (:links new-state) (:links old-state))
