@@ -1,5 +1,6 @@
 (ns sheaf.app
-  (:require [clojure.string :as str]
+  (:require [cljs.reader :as reader]
+            [clojure.string :as str]
             [om.core :as om]
             [om-tools.core :refer-macros [defcomponent]]
             [om-tools.dom :as dom]
@@ -13,8 +14,18 @@
 ;; app state
 
 (def app-state
-  (atom {:links data/links
+  (atom {:links []
          :submission {:url "" :title "" :tags ""}}))
+
+(defn load-links! []
+  (let [stored (some-> (js/localStorage.getItem "links") reader/read-string)]
+    (swap! app-state assoc :links (or stored data/links))))
+
+(defn store-changes! [_ _ old-state new-state]
+  (when-not (= (:links new-state) (:links old-state))
+    (let [s (pr-str (:links new-state))]
+      (println (str "Store links: " s))
+      (js/localStorage.setItem "links" s))))
 
 (defn submit-link [{:keys [submission] :as data}]
   (let [submission (update submission :tags #(set (str/split % #",")))]
@@ -135,4 +146,10 @@
 
 ;; tying it all together
 
-(om/root app app-state {:target (js/document.getElementById "app")})
+(defn init []
+  (enable-console-print!)
+  (add-watch app-state :storage store-changes!)
+  (load-links!)
+  (om/root app app-state {:target (js/document.getElementById "app")}))
+
+(init)
