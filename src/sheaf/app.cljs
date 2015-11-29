@@ -41,8 +41,13 @@
 (defn can-submit? [submission]
   (and (seq (:url submission)) (seq (:title submission))))
 
+(defn parse-tags [s]
+  (->> (str/split s #",")
+       (map #(str/replace % #"\s+" "_"))
+       set))
+
 (defn submit-link [{:keys [submission] :as state}]
-  (let [submission (update submission :tags #(set (str/split % #",")))]
+  (let [submission (update submission :tags parse-tags)]
     (-> (update state :links conj submission)
         (assoc :submission {:url "" :title "" :tags ""}))))
 
@@ -146,7 +151,7 @@
   (render [_]
     (dom/span {:class "tag"
                :on-click #(swap! app-state assoc :query (str "tag:" data))}
-      data)))
+      (str/replace data #"_" " "))))
 
 (defcomponent link-view [data owner]
   (render [_]
