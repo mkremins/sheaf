@@ -97,29 +97,17 @@
 
 ;; Om components
 
-(defcomponent tag-view [data owner]
+(defcomponent search-view [data owner]
   (render [_]
-    (dom/span {:class "tag"
-               :on-click #(swap! app-state assoc :query (str "tag:" data))}
-      data)))
-
-(defcomponent link-view [data owner]
-  (render [_]
-    (dom/div {:class "link"}
-      (dom/div
-        (dom/a {:class "title" :href (:url data)} (:title data))
-        (let [d (domain data)]
-          (dom/span {:class "domain"
-                     :on-click #(swap! app-state assoc :query (str "domain:" d))}
-            d)))
-      (dom/span {:class "tags"}
-        (om/build-all tag-view (sort (:tags data))))
-      (dom/span {:class "buttons"}
-        (dom/span {:on-click #(do (swap! app-state edit-link (:url data))
-                                  (scroll-to-top!))}
-          "edit")
-        (dom/span {:on-click #(swap! app-state delete-link (:url data))}
-          "delete")))))
+    (dom/div {:class "search"}
+      (dom/input {:on-change #(om/update! data :query (value %))
+                  :placeholder "Type to search..."
+                  :type "text"
+                  :value (:query data)})
+      (when (seq (:query data))
+        (dom/span {:class "clear-search"
+                   :on-click (fn [_] (om/transact! data #(dissoc % :query)))}
+          "✕")))))
 
 (defcomponent submit-view [data owner]
   (render [_]
@@ -154,17 +142,29 @@
                      :on-click #(swap! app-state submit-link)}
           "Submit")))))
 
-(defcomponent search-view [data owner]
+(defcomponent tag-view [data owner]
   (render [_]
-    (dom/div {:class "search"}
-      (dom/input {:on-change #(om/update! data :query (value %))
-                  :placeholder "Type to search..."
-                  :type "text"
-                  :value (:query data)})
-      (when (seq (:query data))
-        (dom/span {:class "clear-search"
-                   :on-click (fn [_] (om/transact! data #(dissoc % :query)))}
-          "✕")))))
+    (dom/span {:class "tag"
+               :on-click #(swap! app-state assoc :query (str "tag:" data))}
+      data)))
+
+(defcomponent link-view [data owner]
+  (render [_]
+    (dom/div {:class "link"}
+      (dom/div
+        (dom/a {:class "title" :href (:url data)} (:title data))
+        (let [d (domain data)]
+          (dom/span {:class "domain"
+                     :on-click #(swap! app-state assoc :query (str "domain:" d))}
+            d)))
+      (dom/span {:class "tags"}
+        (om/build-all tag-view (sort (:tags data))))
+      (dom/span {:class "buttons"}
+        (dom/span {:on-click #(do (swap! app-state edit-link (:url data))
+                                  (scroll-to-top!))}
+          "edit")
+        (dom/span {:on-click #(swap! app-state delete-link (:url data))}
+          "delete")))))
 
 (defcomponent app [data owner]
   (render [_]
