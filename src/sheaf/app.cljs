@@ -82,16 +82,17 @@
         (some #(substring? % text) (map str/lower-case (:tags link))))))
 
 (defn parse-query-part [part]
-  (let [[k v] (str/split part #":" 2)
-        k (str/lower-case k)]
-    (cond
-      (and v (= k "domain")) (from-domain? (str/lower-case v))
-      (and v (= k "tag")) (tagged? v)
-      :else (matches-text? (str/lower-case part)))))
+  (if (= (first part) "-")
+    (complement (parse-query-part (subs part 1)))
+    (let [[k v] (str/split part #":" 2)
+          k (str/lower-case k)]
+      (cond
+        (and v (= k "domain")) (from-domain? (str/lower-case v))
+        (and v (= k "tag")) (tagged? v)
+        :else (matches-text? (str/lower-case part))))))
 
 (defn parse-query [query]
-  (->> (str/split query #"\s+")
-       (remove empty?)
+  (->> (str/split (str/trim query) #"\s+")
        (map parse-query-part)
        (reduce every-pred)))
 
