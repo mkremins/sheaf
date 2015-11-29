@@ -158,6 +158,30 @@
                :on-click #(swap! app-state update-query "tag" data %)}
       (str/replace data #"_" " "))))
 
+(defcomponent link-buttons-view [data owner]
+  (init-state [_]
+    {:confirm-deletion? false})
+  (render-state [_ {:keys [confirm-deletion?]}]
+    (dom/span {:class "buttons"}
+      (dom/span {:class "button"
+                 :on-click #(do (swap! app-state edit-link (:url data))
+                                (scroll-to-top!))}
+        "edit")
+      (dom/span {:class "button"
+                 :on-click #(om/set-state! owner :confirm-deletion? true)}
+        "delete")
+      (when confirm-deletion?
+        (dom/span
+          "(are you sure? "
+          (dom/span {:class "button"
+                     :on-click #(swap! app-state delete-link (:url data))}
+            "yes")
+          " / "
+          (dom/span {:class "button"
+                     :on-click #(om/set-state! owner :confirm-deletion? false)}
+            "no")
+          ")")))))
+
 (defcomponent link-view [data owner]
   (render [_]
     (dom/div {:class "link"}
@@ -169,12 +193,7 @@
             d)))
       (dom/span {:class "tags"}
         (om/build-all tag-view (sort (:tags data))))
-      (dom/span {:class "buttons"}
-        (dom/span {:on-click #(do (swap! app-state edit-link (:url data))
-                                  (scroll-to-top!))}
-          "edit")
-        (dom/span {:on-click #(swap! app-state delete-link (:url data))}
-          "delete")))))
+      (om/build link-buttons-view data))))
 
 (defcomponent app [data owner]
   (render [_]
@@ -182,7 +201,7 @@
       (om/build search-view data)
       (om/build submit-view (:submission data))
       (dom/div {:class "links"}
-        (om/build-all link-view (filtered-links data))))))
+        (om/build-all link-view (filtered-links data) {:key :url})))))
 
 ;; tying it all together
 
