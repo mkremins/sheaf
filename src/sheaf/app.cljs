@@ -7,6 +7,11 @@
 
 ;; generic helper fns
 
+(defn scroll-to-top! []
+  ;; same thing, different browsers
+  (set! js/document.body.scrollTop 0)
+  (set! js/document.documentElement.scrollTop 0))
+
 (defn substring? [super sub]
   (not= -1 (.indexOf super sub)))
 
@@ -106,8 +111,11 @@
       (dom/span {:class "tags"}
         (om/build-all tag-view (sort (:tags data))))
       (dom/span {:class "buttons"}
-        (dom/span {:on-click #(swap! app-state edit-link (:url data))} "edit")
-        (dom/span {:on-click #(swap! app-state delete-link (:url data))} "delete")))))
+        (dom/span {:on-click #(do (swap! app-state edit-link (:url data))
+                                  (scroll-to-top!))}
+          "edit")
+        (dom/span {:on-click #(swap! app-state delete-link (:url data))}
+          "delete")))))
 
 (defcomponent submit-view [data owner]
   (render [_]
