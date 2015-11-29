@@ -38,6 +38,9 @@
       (println (str "Store links: " s))
       (js/localStorage.setItem "links" s))))
 
+(defn can-submit? [submission]
+  (and (seq (:url submission)) (seq (:title submission))))
+
 (defn submit-link [{:keys [submission] :as state}]
   (let [submission (update submission :tags #(set (str/split % #",")))]
     (-> (update state :links conj submission)
@@ -119,31 +122,36 @@
 
 (defcomponent submit-view [data owner]
   (render [_]
-    (dom/div {:class "submit"}
-      (dom/table
-        (dom/tr
-          (dom/td "URL")
-          (dom/td
-            (dom/input {:on-change #(om/update! data :url (value %))
-                        :type "text"
-                        :value (:url data)})))
-        (dom/tr
-          (dom/td "Title")
-          (dom/td
-            (dom/input {:on-change #(om/update! data :title (value %))
-                        :type "text"
-                        :value (:title data)})))
-        (dom/tr
-          (dom/td "Tags")
-          (dom/td
-            (dom/input {:on-change #(om/update! data :tags (value %))
-                        :type "text"
-                        :value (:tags data)}))))
-      (dom/button (cond-> {:class "submit-button"
-                           :on-click #(swap! app-state submit-link)}
-                          (or (empty? (:url data)) (empty? (:title data)))
-                          (assoc :disabled true))
-        "Submit"))))
+    (letfn [(submit-on-enter! [ev]
+              (when (and (= (.-key ev) "Enter") (can-submit? @data))
+                (swap! app-state submit-link)))]
+      (dom/div {:class "submit"}
+        (dom/table
+          (dom/tr
+            (dom/td "URL")
+            (dom/td
+              (dom/input {:on-change #(om/update! data :url (value %))
+                          :on-key-up submit-on-enter!
+                          :type "text"
+                          :value (:url data)})))
+          (dom/tr
+            (dom/td "Title")
+            (dom/td
+              (dom/input {:on-change #(om/update! data :title (value %))
+                          :on-key-up submit-on-enter!
+                          :type "text"
+                          :value (:title data)})))
+          (dom/tr
+            (dom/td "Tags")
+            (dom/td
+              (dom/input {:on-change #(om/update! data :tags (value %))
+                          :on-key-up submit-on-enter!
+                          :type "text"
+                          :value (:tags data)}))))
+        (dom/button {:class "submit-button"
+                     :disabled (not (can-submit? data))
+                     :on-click #(swap! app-state submit-link)}
+          "Submit")))))
 
 (defcomponent search-view [data owner]
   (render [_]
