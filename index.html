@@ -73,6 +73,13 @@
     margin-right: 5px;
     padding: 0px 0.5em 1px 0.5em;
   }
+  .link .domain, .link .tag {
+    /* prevent text selection on shift+click */
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
   .link .tags:after {
     color: #888;
     content: "|";

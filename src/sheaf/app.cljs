@@ -146,10 +146,16 @@
                      :on-click #(swap! app-state submit-link)}
           "Submit")))))
 
+(defn update-query [state type text ev]
+  (let [term (str (when (.-shiftKey ev) "-") type ":" text)]
+    (if (.-metaKey ev)
+      (update state :query str " " term)
+      (assoc state :query term))))
+
 (defcomponent tag-view [data owner]
   (render [_]
     (dom/span {:class "tag"
-               :on-click #(swap! app-state assoc :query (str "tag:" data))}
+               :on-click #(swap! app-state update-query "tag" data %)}
       (str/replace data #"_" " "))))
 
 (defcomponent link-view [data owner]
@@ -159,7 +165,7 @@
         (dom/a {:class "title" :href (:url data)} (:title data))
         (let [d (domain data)]
           (dom/span {:class "domain"
-                     :on-click #(swap! app-state assoc :query (str "domain:" d))}
+                     :on-click #(swap! app-state update-query "domain" d %)}
             d)))
       (dom/span {:class "tags"}
         (om/build-all tag-view (sort (:tags data))))
