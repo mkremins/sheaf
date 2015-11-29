@@ -145,15 +145,22 @@
                           (assoc :disabled true))
         "Submit"))))
 
+(defcomponent search-view [data owner]
+  (render [_]
+    (dom/div {:class "search"}
+      (dom/input {:on-change #(om/update! data :query (value %))
+                  :placeholder "Type to search..."
+                  :type "text"
+                  :value (:query data)})
+      (when (seq (:query data))
+        (dom/span {:class "clear-search"
+                   :on-click (fn [_] (om/transact! data #(dissoc % :query)))}
+          "✕")))))
+
 (defcomponent app [data owner]
   (render [_]
     (dom/div
-      (dom/div {:class "search"}
-        (dom/input {:id "search"
-                    :on-change #(om/update! data :query (value %))
-                    :placeholder "Type to search..."
-                    :type "text"
-                    :value (:query data)}))
+      (om/build search-view data)
       (om/build submit-view (:submission data))
       (dom/div {:class "links"}
         (om/build-all link-view (filtered-links data))))))
