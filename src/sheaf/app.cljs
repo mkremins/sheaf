@@ -34,9 +34,7 @@
 
 (defn store-changes! [_ _ old-state new-state]
   (when-not (= (:links new-state) (:links old-state))
-    (let [s (pr-str (:links new-state))]
-      (println (str "Store links: " s))
-      (js/localStorage.setItem "links" s))))
+    (js/localStorage.setItem "links" (pr-str (:links new-state)))))
 
 (defn can-submit? [submission]
   (and (seq (:url submission)) (seq (:title submission))))
