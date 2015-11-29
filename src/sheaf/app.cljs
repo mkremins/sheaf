@@ -24,9 +24,9 @@
   (atom {:submission {:url "" :title "" :tags ""}}))
 
 (def default-links
-  [{:title "Locked doors, headaches, and intellectual need"
-    :url "http://mkremins.github.io/blog/doors-headaches-intellectual-need/"
-    :tags #{"games" "learning"}}])
+  '({:title "Locked doors, headaches, and intellectual need"
+     :url "http://mkremins.github.io/blog/doors-headaches-intellectual-need/"
+     :tags #{"games" "learning"}}))
 
 (defn load-links! []
   (let [stored (some-> (js/localStorage.getItem "links") reader/read-string)]
@@ -52,7 +52,7 @@
         (assoc :submission {:url "" :title "" :tags ""}))))
 
 (defn delete-link [state url]
-  (update state :links (fn [links] (vec (remove #(= (:url %) url) links)))))
+  (update state :links (fn [links] (remove #(= (:url %) url) links))))
 
 (defn edit-link [state url]
   (let [link (-> (first (filter #(= (:url %) url) (:links state)))
