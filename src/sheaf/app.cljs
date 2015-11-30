@@ -195,13 +195,25 @@
         (om/build-all tag-view (sort (:tags data))))
       (om/build link-buttons-view data))))
 
+(defcomponent tag-counts-view [data owner]
+  (render [_]
+    (let [tag-counts (->> (frequencies (mapcat :tags data))
+                          (sort-by (juxt (comp - val) key)))]
+      (dom/div {:class "tag-counts"}
+        (for [[tag count] tag-counts]
+          (dom/span
+            (om/build tag-view tag)
+            (dom/span {:class "count"} count)))))))
+
 (defcomponent app [data owner]
   (render [_]
-    (dom/div
-      (om/build search-view data)
-      (om/build submit-view (:submission data))
-      (dom/div {:class "links"}
-        (om/build-all link-view (filtered-links data) {:key :url})))))
+    (let [links (filtered-links data)]
+      (dom/div
+        (om/build search-view data)
+        (om/build submit-view (:submission data))
+        (dom/div {:class "links"}
+          (om/build-all link-view links {:key :url}))
+        (om/build tag-counts-view links)))))
 
 ;; tying it all together
 

@@ -47,6 +47,9 @@
     position: absolute;
     right: 0.5rem;
   }
+  .links {
+    margin-bottom: 1.75em;
+  }
   .link {
     margin-bottom: 1em;
     position: relative;
@@ -63,7 +66,7 @@
     font-size: 12px;
     font-style: italic;
   }
-  .link .tag {
+  .tag {
     background-color: #fffcd7;
     border: 1px solid #d5d458;
     border-radius: 10px;
@@ -73,7 +76,7 @@
     margin-right: 5px;
     padding: 0px 0.5em 1px 0.5em;
   }
-  .link .domain, .link .tag {
+  .link .domain, .tag {
     /* prevent text selection on shift+click */
     -moz-user-select: none;
     -ms-user-select: none;
@@ -100,6 +103,15 @@
   }
   .link .buttons .button:hover {
     color: black;
+  }
+  .tag-counts {
+    display: flex;
+    flex-flow: row wrap;
+    font-size: 10px;
+  }
+  .tag-counts > * {
+    margin-bottom: 0.75em;
+    margin-right: 0.75em;
   }
   </style>
 </head>
